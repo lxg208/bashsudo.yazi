@@ -1,14 +1,14 @@
 
 # Table of Contents
 
-1.  [Disclaimer](#org1a2cac5)
-2.  [Requirements](#org27157af)
-3.  [Installation](#org4f6157c)
-    1.  [Via `ya pkg` (recommended)](#org53f71b1)
-    2.  [Manual](#orga397d33)
-4.  [Keymap](#org06cb1e3)
-5.  [Commands](#orgdc25477)
-6.  [License](#orgb568351)
+1.  [Disclaimer](#org7da0ae3)
+2.  [Requirements](#orgff6ee28)
+3.  [Installation](#orgcb6bcb6)
+    1.  [Via `ya pkg` (recommended)](#orgb4efda8)
+    2.  [Manual](#orgc6cc06e)
+4.  [Keymap](#org35e7818)
+5.  [Commands](#orga6bc13d)
+6.  [License](#org81d9e00)
 
 A [yazi](https://github.com/sxyazi/yazi) plugin that performs file operations with `sudo` — copy, move, rename,
 link, create, delete, chmod, and edit — using pure `bash`. No [Nushell](https://www.nushell.sh/) required.
@@ -16,7 +16,7 @@ link, create, delete, chmod, and edit — using pure `bash`. No [Nushell](https:
 Inspired by [sudo.yazi](https://github.com/TD-Sky/sudo.yazi).
 
 
-<a id="org1a2cac5"></a>
+<a id="org7da0ae3"></a>
 
 # Disclaimer
 
@@ -36,7 +36,7 @@ system damage caused by the use of this plugin.
 **Always double-check your selection before confirming any destructive operation.**
 
 
-<a id="org27157af"></a>
+<a id="orgff6ee28"></a>
 
 # Requirements
 
@@ -47,19 +47,19 @@ system damage caused by the use of this plugin.
     -   `gio` — available on most GNOME-based systems
 
 
-<a id="org4f6157c"></a>
+<a id="orgcb6bcb6"></a>
 
 # Installation
 
 
-<a id="org53f71b1"></a>
+<a id="orgb4efda8"></a>
 
 ## Via `ya pkg` (recommended)
 
     ya pkg add lxg208/bashsudo
 
 
-<a id="orga397d33"></a>
+<a id="orgc6cc06e"></a>
 
 ## Manual
 
@@ -68,12 +68,26 @@ system damage caused by the use of this plugin.
     chmod +x ~/.config/yazi/plugins/bashsudo.yazi/assets/bashsudo.sh
 
 
-<a id="org06cb1e3"></a>
+<a id="org35e7818"></a>
 
 # Keymap
 
 Add the following to your `~/.config/yazi/keymap.toml`:
 
+    # bashsudo.yazi keybindings
+    
+    # Reserve R as a prefix for bashsudo
+    [[mgr.prepend_keymap]]
+    on = ["R"]
+    run = "noop"
+    desc = "bashsudo prefix"
+    
+    # Suppress p as a sub-prefix while waiting for R p p / R p l / R p r / R p L
+    [[mgr.prepend_keymap]]
+    on = ["R", "p"]
+    run = "noop"
+    desc = "bashsudo paste prefix"
+    
     # sudo cp/mv (paste)
     [[mgr.prepend_keymap]]
     on = ["R", "p", "p"]
@@ -141,7 +155,7 @@ Add the following to your `~/.config/yazi/keymap.toml`:
     desc = "bashsudo edit with $EDITOR"
 
 
-<a id="orgdc25477"></a>
+<a id="orga6bc13d"></a>
 
 # Commands
 
@@ -232,7 +246,7 @@ Add the following to your `~/.config/yazi/keymap.toml`:
 </table>
 
 
-<a id="orgb568351"></a>
+<a id="org81d9e00"></a>
 
 # License
 
