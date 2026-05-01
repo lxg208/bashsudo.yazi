@@ -1,0 +1,155 @@
+#+TITLE: bashsudo.yazi
+#+AUTHOR: lxg208
+#+DATE: 2025
+#+COMMENT: This is the source file. Export to README.md with M-x org-md-export-to-markdown
+
+A [[https://github.com/sxyazi/yazi][yazi]] plugin that performs file operations with =sudo= — copy, move, rename,
+link, create, delete, chmod, and edit — using pure =bash=. No [[https://www.nushell.sh/][Nushell]] required.
+
+Inspired by [[https://github.com/TD-Sky/sudo.yazi][sudo.yazi]].
+
+* Disclaimer
+
+#+BEGIN_QUOTE
+*This plugin is a work in progress.* It is functional but has not been
+extensively tested across all environments and edge cases.
+#+END_QUOTE
+
+Several operations in this plugin invoke =sudo= to perform privileged file
+operations. This means:
+
+- Commands may prompt for your password
+- Mistakes (e.g. wrong path, wrong mode) are executed with root privileges
+- *There is no undo* for permanent deletions (=R D=)
+
+Use with caution. The authors take no responsibility for data loss or
+system damage caused by the use of this plugin.
+
+*Always double-check your selection before confirming any destructive operation.*
+
+* Requirements
+
+- =bash=
+- =sudo=
+- A trash tool for non-permanent deletion (one of the following):
+  - [[https://github.com/andreafrancia/trash-cli][trash-cli]] — provides =trash-put=
+  - =gio= — available on most GNOME-based systems
+
+* Installation
+
+** Via =ya pkg= (recommended)
+
+#+BEGIN_SRC bash
+ya pkg add lxg208/bashsudo
+#+END_SRC
+
+** Manual
+
+#+BEGIN_SRC bash
+git clone https://github.com/lxg208/bashsudo.yazi.git \
+  ~/.config/yazi/plugins/bashsudo.yazi
+chmod +x ~/.config/yazi/plugins/bashsudo.yazi/assets/bashsudo.sh
+#+END_SRC
+
+* Keymap
+
+Add the following to your =~/.config/yazi/keymap.toml=:
+
+#+BEGIN_SRC toml
+# sudo cp/mv (paste)
+[[mgr.prepend_keymap]]
+on = ["R", "p", "p"]
+run = "plugin bashsudo -- paste"
+desc = "bashsudo paste"
+
+# sudo cp/mv --force (paste, overwrite)
+[[mgr.prepend_keymap]]
+on = ["R", "P"]
+run = "plugin bashsudo -- paste --force"
+desc = "bashsudo paste (force)"
+
+# sudo mv (rename)
+[[mgr.prepend_keymap]]
+on = ["R", "r"]
+run = "plugin bashsudo -- rename"
+desc = "bashsudo rename"
+
+# sudo ln -s (absolute path)
+[[mgr.prepend_keymap]]
+on = ["R", "p", "l"]
+run = "plugin bashsudo -- link"
+desc = "bashsudo symlink (absolute)"
+
+# sudo ln -s (relative path)
+[[mgr.prepend_keymap]]
+on = ["R", "p", "r"]
+run = "plugin bashsudo -- link --relative"
+desc = "bashsudo symlink (relative)"
+
+# sudo ln (hardlink)
+[[mgr.prepend_keymap]]
+on = ["R", "p", "L"]
+run = "plugin bashsudo -- hardlink"
+desc = "bashsudo hardlink"
+
+# sudo touch / mkdir
+[[mgr.prepend_keymap]]
+on = ["R", "a"]
+run = "plugin bashsudo -- create"
+desc = "bashsudo create file/dir"
+
+# sudo trash
+[[mgr.prepend_keymap]]
+on = ["R", "d"]
+run = "plugin bashsudo -- remove"
+desc = "bashsudo trash"
+
+# sudo delete permanently
+[[mgr.prepend_keymap]]
+on = ["R", "D"]
+run = "plugin bashsudo -- remove --permanent"
+desc = "bashsudo delete permanently"
+
+# sudo chmod
+[[mgr.prepend_keymap]]
+on = ["R", "m"]
+run = "plugin bashsudo -- chmod"
+desc = "bashsudo chmod"
+
+# edit with $EDITOR (sudo if needed)
+[[mgr.prepend_keymap]]
+on = ["R", "e"]
+run = "plugin bashsudo -- edit"
+desc = "bashsudo edit with $EDITOR"
+#+END_SRC
+
+* Commands
+
+| Key       | Command            | Description                                              |
+|-----------+--------------------+----------------------------------------------------------|
+| R p p     | paste              | Copy or move yanked files with sudo                      |
+| R P       | paste --force      | Same, but overwrite existing files                       |
+| R r       | rename             | Rename hovered file with sudo                            |
+| R p l     | link               | Create absolute symlink with sudo                        |
+| R p r     | link --relative    | Create relative symlink with sudo                        |
+| R p L     | hardlink           | Create hard link with sudo                               |
+| R a       | create             | Create file or directory (append / for directory)        |
+| R d       | remove             | Move selected files to trash                             |
+| R D       | remove --permanent | Permanently delete selected files with sudo              |
+| R m       | chmod              | Change file permissions with sudo                        |
+| R e       | edit               | Open hovered file in $EDITOR (sudo if not writable)      |
+
+* License
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see [[https://www.gnu.org/licenses/][https://www.gnu.org/licenses/]].

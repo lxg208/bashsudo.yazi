@@ -1,0 +1,173 @@
+#+TITLE: bashsudo.yazi — Design Document
+#+AUTHOR: lxg208
+#+DATE: 2026-05-01
+
+* Overview
+
+=bashsudo.yazi= is a [[https://github.com/sxyazi/yazi][yazi]] file manager plugin that performs privileged file
+operations using pure =bash= — no [[https://www.nushell.sh/][Nushell]] required. It is inspired by
+[[https://github.com/TD-Sky/sudo.yazi][sudo.yazi]] and follows the same keymap convention.
+
+The core design principle is: *operations should resemble what the equivalent
+bash command does directly in the terminal.* Privilege escalation via =sudo= is
+only applied when necessary, not unconditionally.
+
+* Architecture
+
+The plugin consists of two files:
+
+- =main.lua= — the yazi-facing Lua plugin. Reads app state (selected files,
+  hovered file, yank state), handles user prompts via =ya.input=, and dispatches
+  commands to the bash backend via =ya.emit("shell",...)=.
+
+- =assets/bashsudo.sh= — the bash backend. Performs the actual file operations
+  (=cp=, =mv=, =rm=, =ln=, =touch=, =mkdir=). Receives all arguments from Lua
+  and does not prompt interactively. =sudo= is never called inside the script —
+  all privilege decisions are made in =main.lua=.
+
+* Design Principles
+
+1. *Resemble bash behavior* — each operation should behave as close as possible
+   to its bash equivalent run directly in the terminal.
+
+2. *Minimal sudo* — =sudo= is only used when the current user does not own the
+   file, or when the operation inherently requires elevated privileges (e.g.
+   paste, link, create).
+
+3. *No silent fallback* — if an operation fails (e.g. trash), notify the user
+   and stop. Never silently escalate to a more destructive operation.
+
+4. *Explicit confirmation for destructive operations* — permanent delete always
+   requires user confirmation showing the item count.
+
+* Operation Design
+
+| Operation        | sudo              | Extra logic                                        | Tested |
+|------------------+-------------------+----------------------------------------------------+--------|
+| edit             | Only if not owner | Open =$EDITOR= directly                            | ✅     |
+| chmod            | Only if not owner | Ask recursive only if a directory is selected      | ✅     |
+| trash            | Only if not owner | Never fall back to =rm= on failure                 | ✅     |
+| paste (cp/mv)    | Always            | =legit_name= for conflicts, =--force= to overwrite | ✅     |
+| link (all three) | Always            | =legit_name= for conflicts                         | ✅     |
+| create           | Always            | Trailing =/= → =mkdir -p=, else =touch=            | ✅     |
+| rename           | Only if not owner | Warn on conflict, do not auto-rename               | ✅     |
+| permanent delete | Always            | Confirm before executing, show item count          | ✅     |
+
+* Operation Details
+
+** edit
+Open the hovered file in =$EDITOR= (falls back to =vi= if unset).
+
+- If the current user owns the file → open directly without =sudo=
+- If the current user does not own the file → prepend =sudo=
+- Ownership is checked via =stat -c '%U'=
+
+** chmod
+Change file permissions on selected files or directories.
+
+- Prompt for mode (e.g. =755=, =+x=, =-w=)
+- If any selected path is a directory → prompt "Apply recursively? [y/N]"
+- If the current user owns all selected files → run =chmod= directly
+- If any selected file is not owned by the current user → prepend =sudo=
+
+** trash (remove)
+Move selected files to the system trash.
+
+- If the current user owns the file → =trash-put= directly
+- If the current user does not own the file → =sudo trash-put=
+- Falls back to =gio trash= if =trash-put= is not available
+- If trash fails → notify the user with the error, do not fall back to =rm=
+
+#+BEGIN_QUOTE
+*Note:* When =sudo trash-put= is used for files not owned by the current user,
+the file is moved to *root's trash* (=/root/.local/share/Trash/files/=) rather
+than the user's own trash. To restore such files:
+
+#+BEGIN_SRC bash
+sudo trash-restore
+# or manually:
+sudo mv /root/.local/share/Trash/files/<filename> <original-path>
+#+END_SRC
+#+END_QUOTE
+
+** paste (cp / mv)
+Copy or move yanked files into the current directory.
+
+- Always uses =sudo=
+- Operation is determined by yank state: =copy= → =cp=, =cut= → =mv=
+- Destination conflict → resolved automatically using =legit_name=
+- =--force= flag → overwrite existing files without =legit_name=
+
+** link
+Create a symbolic or hard link to yanked files in the current directory.
+
+- Always uses =sudo=
+- Three variants:
+  - =link= → =ln -s= (absolute symlink)
+  - =link --relative= → =ln -sr= (relative symlink)
+  - =hardlink= → =ln= (hard link)
+- Destination conflict → resolved automatically using =legit_name=
+
+** create
+Create a new file or directory in the current directory.
+
+- Always uses =sudo=
+- Input is prompted via =ya.input=
+- Trailing =/= in the name → =sudo mkdir -p=
+- No trailing =/= → =sudo touch=
+- Yazi's shell runs in the current directory, so no cwd resolution is needed
+
+** rename
+Rename the hovered file.
+
+- If the current user owns the file → =mv= directly without =sudo=
+- If the current user does not own the file → =sudo mv=
+- If the new name already exists → notify the user and abort (no auto-rename)
+
+** permanent delete
+Permanently delete selected files using =sudo rm -rf=.
+
+- Always uses =sudo=
+- Prompts for confirmation before executing, showing the number of items
+- This operation is irreversible — no fallback, no undo
+
+* legit_name
+
+=legit_name= is a bash helper function that finds a non-conflicting filename
+before copying, moving, or linking. If =file.txt= already exists in the
+destination, it automatically tries =file_1.txt=, =file_2.txt=, etc. until a
+free name is found.
+
+It is only used when =--force= is *not* passed.
+
+* Keymap
+
+| Key   | Action             | Description                                  |
+|-------+--------------------+----------------------------------------------|
+| R p p | paste              | Copy or move yanked files with sudo          |
+| R P   | paste --force      | Same, but overwrite existing files           |
+| R r   | rename             | Rename hovered file (sudo if not owner)      |
+| R p l | link               | Create absolute symlink with sudo            |
+| R p r | link --relative    | Create relative symlink with sudo            |
+| R p L | hardlink           | Create hard link with sudo                   |
+| R a   | create             | Create file or directory with sudo           |
+| R d   | remove             | Move selected files to trash                 |
+| R D   | remove --permanent | Permanently delete selected files with sudo  |
+| R m   | chmod              | Change permissions (sudo if not owner)       |
+| R e   | edit               | Open in =$EDITOR= (sudo if not owner)        |
+
+* Dependencies
+
+- =bash=
+- =sudo=
+- =trash-put= (from [[https://github.com/andreafrancia/trash-cli][trash-cli]]) or =gio= for non-permanent deletion
+
+* Known Limitations
+
+- =sudo trash-put= sends files to root's trash (=/root/.local/share/Trash/=)
+  rather than the user's trash. Files can be restored with =sudo trash-restore=
+  or manually moved back.
+
+* Status
+
+This plugin is a work in progress. See =README.org= for the disclaimer.
