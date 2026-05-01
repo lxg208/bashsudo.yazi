@@ -56,85 +56,85 @@ chmod +x ~/.config/yazi/plugins/bashsudo.yazi/assets/bashsudo.sh
 Add the following to your =~/.config/yazi/keymap.toml=:
 
 #+BEGIN_SRC toml
-  # bashsudo.yazi keybindings
+# bashsudo.yazi keybindings
 
-  # Reserve R as a prefix for bashsudo
-  [[mgr.prepend_keymap]]
-  on = ["R"]
-  run = "noop"
-  desc = "bashsudo prefix"
+# Reserve R as a prefix for bashsudo
+[[mgr.prepend_keymap]]
+on = ["R"]
+run = "noop"
+desc = "bashsudo prefix"
 
-  # Suppress p as a sub-prefix while waiting for R p p / R p l / R p r / R p L
-  [[mgr.prepend_keymap]]
-  on = ["R", "p"]
-  run = "noop"
-  desc = "bashsudo paste prefix"
+# Suppress p as a sub-prefix while waiting for R p p / R p l / R p r / R p L
+[[mgr.prepend_keymap]]
+on = ["R", "p"]
+run = "noop"
+desc = "bashsudo paste prefix"
 
-  # sudo cp/mv (paste)
-  [[mgr.prepend_keymap]]
-  on = ["R", "p", "p"]
-  run = "plugin bashsudo -- paste"
-  desc = "bashsudo paste"
+# sudo cp/mv (paste)
+[[mgr.prepend_keymap]]
+on = ["R", "p", "p"]
+run = "plugin bashsudo -- paste"
+desc = "bashsudo paste"
 
-  # sudo cp/mv --force (paste, overwrite)
-  [[mgr.prepend_keymap]]
-  on = ["R", "P"]
-  run = "plugin bashsudo -- paste --force"
-  desc = "bashsudo paste (force)"
+# sudo cp/mv --force (paste, overwrite)
+[[mgr.prepend_keymap]]
+on = ["R", "P"]
+run = "plugin bashsudo -- paste --force"
+desc = "bashsudo paste (force)"
 
-  # sudo mv (rename)
-  [[mgr.prepend_keymap]]
-  on = ["R", "r"]
-  run = "plugin bashsudo -- rename"
-  desc = "bashsudo rename"
+# sudo mv (rename)
+[[mgr.prepend_keymap]]
+on = ["R", "r"]
+run = "plugin bashsudo -- rename"
+desc = "bashsudo rename"
 
-  # sudo ln -s (absolute path)
-  [[mgr.prepend_keymap]]
-  on = ["R", "p", "l"]
-  run = "plugin bashsudo -- link"
-  desc = "bashsudo symlink (absolute)"
+# sudo ln -s (absolute path)
+[[mgr.prepend_keymap]]
+on = ["R", "p", "l"]
+run = "plugin bashsudo -- link"
+desc = "bashsudo symlink (absolute)"
 
-  # sudo ln -s (relative path)
-  [[mgr.prepend_keymap]]
-  on = ["R", "p", "r"]
-  run = "plugin bashsudo -- link --relative"
-  desc = "bashsudo symlink (relative)"
+# sudo ln -s (relative path)
+[[mgr.prepend_keymap]]
+on = ["R", "p", "r"]
+run = "plugin bashsudo -- link --relative"
+desc = "bashsudo symlink (relative)"
 
-  # sudo ln (hardlink)
-  [[mgr.prepend_keymap]]
-  on = ["R", "p", "L"]
-  run = "plugin bashsudo -- hardlink"
-  desc = "bashsudo hardlink"
+# sudo ln (hardlink)
+[[mgr.prepend_keymap]]
+on = ["R", "p", "L"]
+run = "plugin bashsudo -- hardlink"
+desc = "bashsudo hardlink"
 
-  # sudo touch / mkdir
-  [[mgr.prepend_keymap]]
-  on = ["R", "a"]
-  run = "plugin bashsudo -- create"
-  desc = "bashsudo create file/dir"
+# sudo touch / mkdir
+[[mgr.prepend_keymap]]
+on = ["R", "a"]
+run = "plugin bashsudo -- create"
+desc = "bashsudo create file/dir"
 
-  # sudo trash
-  [[mgr.prepend_keymap]]
-  on = ["R", "d"]
-  run = "plugin bashsudo -- remove"
-  desc = "bashsudo trash"
+# sudo trash
+[[mgr.prepend_keymap]]
+on = ["R", "d"]
+run = "plugin bashsudo -- remove"
+desc = "bashsudo trash"
 
-  # sudo delete permanently
-  [[mgr.prepend_keymap]]
-  on = ["R", "D"]
-  run = "plugin bashsudo -- remove --permanent"
-  desc = "bashsudo delete permanently"
+# sudo delete permanently
+[[mgr.prepend_keymap]]
+on = ["R", "D"]
+run = "plugin bashsudo -- remove --permanent"
+desc = "bashsudo delete permanently"
 
-  # sudo chmod
-  [[mgr.prepend_keymap]]
-  on = ["R", "m"]
-  run = "plugin bashsudo -- chmod"
-  desc = "bashsudo chmod"
+# sudo chmod
+[[mgr.prepend_keymap]]
+on = ["R", "m"]
+run = "plugin bashsudo -- chmod"
+desc = "bashsudo chmod"
 
-  # edit with $EDITOR (sudo if needed)
-  [[mgr.prepend_keymap]]
-  on = ["R", "e"]
-  run = "plugin bashsudo -- edit"
-  desc = "bashsudo edit with $EDITOR"
+# edit with $EDITOR (sudo if needed)
+[[mgr.prepend_keymap]]
+on = ["R", "e"]
+run = "plugin bashsudo -- edit"
+desc = "bashsudo edit with $EDITOR"
 #+END_SRC
 
 * Commands

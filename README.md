@@ -1,14 +1,14 @@
 
 # Table of Contents
 
-1.  [Disclaimer](#org7da0ae3)
-2.  [Requirements](#orgff6ee28)
-3.  [Installation](#orgcb6bcb6)
-    1.  [Via `ya pkg` (recommended)](#orgb4efda8)
-    2.  [Manual](#orgc6cc06e)
-4.  [Keymap](#org35e7818)
-5.  [Commands](#orga6bc13d)
-6.  [License](#org81d9e00)
+1.  [Disclaimer](#orgaa51e57)
+2.  [Requirements](#org4616138)
+3.  [Installation](#org7a30276)
+    1.  [Via `ya pkg` (recommended)](#orgd4549bd)
+    2.  [Manual](#org2894890)
+4.  [Keymap](#orgf14b742)
+5.  [Commands](#org56c0097)
+6.  [License](#org4e5eb00)
 
 A [yazi](https://github.com/sxyazi/yazi) plugin that performs file operations with `sudo` — copy, move, rename,
 link, create, delete, chmod, and edit — using pure `bash`. No [Nushell](https://www.nushell.sh/) required.
@@ -16,7 +16,7 @@ link, create, delete, chmod, and edit — using pure `bash`. No [Nushell](https:
 Inspired by [sudo.yazi](https://github.com/TD-Sky/sudo.yazi).
 
 
-<a id="org7da0ae3"></a>
+<a id="orgaa51e57"></a>
 
 # Disclaimer
 
@@ -36,7 +36,7 @@ system damage caused by the use of this plugin.
 **Always double-check your selection before confirming any destructive operation.**
 
 
-<a id="orgff6ee28"></a>
+<a id="org4616138"></a>
 
 # Requirements
 
@@ -47,19 +47,19 @@ system damage caused by the use of this plugin.
     -   `gio` — available on most GNOME-based systems
 
 
-<a id="orgcb6bcb6"></a>
+<a id="org7a30276"></a>
 
 # Installation
 
 
-<a id="orgb4efda8"></a>
+<a id="orgd4549bd"></a>
 
 ## Via `ya pkg` (recommended)
 
     ya pkg add lxg208/bashsudo
 
 
-<a id="orgc6cc06e"></a>
+<a id="org2894890"></a>
 
 ## Manual
 
@@ -68,7 +68,7 @@ system damage caused by the use of this plugin.
     chmod +x ~/.config/yazi/plugins/bashsudo.yazi/assets/bashsudo.sh
 
 
-<a id="org35e7818"></a>
+<a id="orgf14b742"></a>
 
 # Keymap
 
@@ -155,7 +155,7 @@ Add the following to your `~/.config/yazi/keymap.toml`:
     desc = "bashsudo edit with $EDITOR"
 
 
-<a id="orga6bc13d"></a>
+<a id="org56c0097"></a>
 
 # Commands
 
@@ -246,7 +246,7 @@ Add the following to your `~/.config/yazi/keymap.toml`:
 </table>
 
 
-<a id="org81d9e00"></a>
+<a id="org4e5eb00"></a>
 
 # License
 
